@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dr E's Robot Shop</title>
+<link href="css/jquery-ui.min.css" rel="stylesheet">
+<style>
+	body {
+		background-color: rgb(235, 245, 255);
+		margin-left: 125px;
+		margin-right: 125px;
+	}
+	img {
+		width: 200px;
+		height: 250px;
+		border: 5px outset blue;
+		border-radius: 5px;
+	}
+	td {
+		text-align: center;
+	}
+</style>
+<script src="jquery-3.1.1.min.js">
+</script>
+<script src="jquery-ui.min.js">
+</script>
+<script src="jquery.validate.min.js">
+</script>
+<script>
+$(document).ready(function() {
+	var states = [
+		{value : "AL", label: "Alabama"},
+		{value : "AK", label: "Alaska"},
+		{value : "AZ", label: "Arizona"},
+		{value : "AR", label: "Arkansas"},
+		{value : "CA", label: "California"},
+		{value : "CO", label: "Colorado"},
+		{value : "CT", label: "Connecticut"},
+		{value : "DE", label: "Delaware"},
+		{value : "FL", label: "Florida"},
+		{value : "GA", label: "Georgia"},
+		{value : "HI", label: "Hawaii"},
+		{value : "ID", label: "Idaho"},
+		{value : "IL", label: "Illinois"},
+		{value : "IN", label: "Indiana"},
+		{value : "IA", label: "Iowa"},
+		{value : "KS", label: "Kansas"},
+		{value : "KY", label: "Kentucky"},
+		{value : "LA", label: "Louisiana"},
+		{value : "ME", label: "Maine"},
+		{value : "MD", label: "Maryland"},
+		{value : "MA", label: "Massachusetts"},
+		{value : "MI", label: "Michigan"},
+		{value : "MN", label: "Minnesota"},
+		{value : "MS", label: "Mississippi"},
+		{value : "MO", label: "Missouri"},
+		{value : "MT", label: "Montana"},
+		{value : "NE", label: "Nebraska"},
+		{value : "NV", label: "Nevada"},
+		{value : "NH", label: "New Hampshire"},
+		{value : "NJ", label: "New Jersey"},
+		{value : "NM", label: "New Mexico"},
+		{value : "NY", label: "New York"},
+		{value : "NC", label: "North Carolina"},
+		{value : "ND", label: "North Dakota"},
+		{value : "OH", label: "Ohio"},
+		{value : "OK", label: "Oklahoma"},
+		{value : "OR", label: "Oregon"},
+		{value : "PA", label: "Pennsylvania"},
+		{value : "RI", label: "Rhode Island"},
+		{value : "SC", label: "South Carolina"},
+		{value : "SD", label: "South Dakota"},
+		{value : "TN", label: "Tennessee"},
+		{value : "TX", label: "Texas"},
+		{value : "UT", label: "Utah"},
+		{value : "VT", label: "Vermont"},
+		{value : "VA", label: "Virginia"},
+		{value : "WA", label: "Washington"},
+		{value : "WV", label: "West Virginia"},
+		{value : "WI", label: "Wisconsin"},
+		{value : "WY", label: "Wyoming"}
+	];
+	
+	$("#state").autocomplete({
+		source : states
+	});
+	
+	$("#shipState").autocomplete({
+		source : states
+	});
+	
+	$("#tabContainer").tabs({
+		show: "fadeIn",
+		hide: "fadeOut"
+	}); //end tabs
+	
+	$("#aboutTabs").tabs({
+		show: "fadeIn",
+		hide: "fadeOut"
+	});
+	
+	$("#date").datepicker({
+		changeMonth: true,
+		changeYear: true,
+		minDate: 10,
+		dateFormat: "m-dd-yy"
+	}); //end datepicker
+	
+	$("#replicator").checkboxradio();
+	$("#nanorobot").checkboxradio();
+	$("#robotkit").checkboxradio();
+	$("#assistant").checkboxradio();
+	$("#mathbot").checkboxradio();
+	
+	$("#submit").button();
+	$("#contactBtn").button();
+	
+	$(".replicatorQty").hide();
+	$(".nanorobotQty").hide();
+	$(".kitQty").hide();
+	$(".assistantQty").hide();
+	$(".mathbotQty").hide();
+	
+	$("#replicator").click(function() {
+		if ($("#replicator").prop("checked")) {
+			$(".replicatorQty").slideDown();
+		}
+		else{
+			$(".replicatorQty").slideUp();
+			$("#replicatorQty").val("");
+		}
+	});
+	
+	$("#nanorobot").click(function() {
+		if ($("#nanorobot").prop("checked")) {
+			$(".nanorobotQty").slideDown();
+		}
+		else{
+			$(".nanorobotQty").slideUp();
+			$("#nanorobotQty").val("");
+		}
+	});
+	
+	$("#robotkit").click(function() {
+		if ($("#robotkit").prop("checked")) {
+			$(".kitQty").slideDown();
+		}
+		else{
+			$(".kitQty").slideUp();
+			$("#kitQty").val("");
+		}
+	});
+	
+	$("#assistant").click(function() {
+		if ($("#assistant").prop("checked")) {
+			$(".assistantQty").slideDown();
+		}
+		else{
+			$(".assistantQty").slideUp();
+			$("#assistantQty").val("");
+		}
+	});
+	
+	$("#mathbot").click(function() {
+		if ($("#mathbot").prop("checked")) {
+			$(".mathbotQty").slideDown();
+		}
+		else{
+			$(".mathbotQty").slideUp();
+			$("#mathbotQty").val("");
+		}
+	});
+	
+	//*************Tooltips**************	
+	$("#replicatorImg").tooltip({
+		content: $("#replicatorTip").html()
+	}); //end tooltip
+	
+	$("#nanorobotImg").tooltip({
+		content: $("#nanorobotTip").html()
+	}); //end tooltip
+	
+	$("#kitImg").tooltip({
+		content: $("#robotkitTip").html()
+	}); //end tooltip
+	
+	$("#assistantImg").tooltip({
+		content: $("#assistantTip").html()
+	}); //end tooltip
+	
+	$("#mathbotImg").tooltip({
+		content: $("#mathbotTip").html()
+	}); //end tooltip
+	
+	$("#submit").click(function(){
+		//**********Calculate Totals************
+		var subtotal = 0;
+		var shipping = 0;
+		var salesTax = 0;
+		var discount = 0;
+		var total = 0.0;
+		
+		//**********Calculate Subtotal**********
+		if ($("#replicator").prop("checked")) {
+			subtotal += 300 * Number($("#replicatorQty").val());
+		}
+		
+		if ($("#nanorobot").prop("checked")) {
+			subtotal += 200 * Number($("#nanorobotQty").val());
+		}
+		
+		if ($("#robotkit").prop("checked")) {
+			subtotal += 50 * Number($("#kitQty").val());
+		}
+		
+		if ($("#assistant").prop("checked")) {
+			subtotal += 150 * Number($("#assistantQty").val());
+		}
+		
+		if ($("#mathbot").prop("checked")) {
+			subtotal += 100 * Number($("#mathbotQty").val());
+		}
+		
+		//**********Calculate Shipping**********
+		if (subtotal <= 100) {
+			shipping = 5;
+		}
+		else if (subtotal >= 101 && subtotal <= 300) {
+			shipping = 20;
+		}
+		else {
+			shipping = 0;
+		}
+		
+		//**********Calculate Sales Tax*********
+		//Sales tax is 7% of the subtotal
+		salesTax = subtotal * 0.07;
+		
+		//round to two decimal places
+		salesTax = Math.round(salesTax * 100) / 100;
+		
+		//**********Calculate Discount**********
+		if (subtotal > 1000) {
+			discount = subtotal * 0.1;
+		}
+		
+		//**********Calculate Total*************
+		total = subtotal + shipping + salesTax - discount;
+		
+		$("#subtotal").text("Subtotal: $" + subtotal);
+		$("#shipping").text("Shipping: $" + shipping);
+		$("#salesTax").text("Sales Tax: $" + salesTax);
+		$("#discount").text("Discount: $" + discount);
+		$("#total").text("Total: $" + total);
+		
+		$("#confirm").dialog("open");
+	}); //end click
+	
+	//************Order Form Validation****************
+	$("#orderForm").validate({
+		rules: {
+			replicatorQty: {
+				min: 1
+			},
+			nanorobotQty: {
+				min: 1
+			},
+			kitQty: {
+				min: 1
+			},
+			assistantQty: {
+				min: 1
+			},
+			mathbotQty: {
+				min: 1
+			},
+			name: {
+				required: true
+			},
+			email: {
+				required: true
+			},
+			address: {
+				required: true
+			},
+			city: {
+				required: true
+			},
+			state: {
+				required: true
+			},
+			zipcode: {
+				required: true
+			},
+			phone: {
+				required: true
+			},
+			shipAddress: {
+				required: true
+			},
+			shipCity: {
+				required: true
+			},
+			shipState: {
+				required: true
+			},
+			shipZipcode: {
+				required: true
+			},
+			date: {
+				required: true
+			}
+		},
+		messages: {
+			replicatorQty: {
+				min: "Must be a number greater than 0"
+			},
+			nanorobotQty: {
+				min: "Must be a number greater than 0"
+			},
+			kitQty: {
+				min: "Must be a number greater than 0"
+			},
+			assistantQty: {
+				min: "Must be a number greater than 0"
+			},
+			mathbotQty: {
+				min: "Must be a number greater than 0"
+			},
+			name: {
+				required: "Please enter your name"
+			},
+			email: {
+				required: "Please enter your email address"
+			},
+			address: {
+				required: "What is your address?"
+			},
+			city: {
+				required: "What city?"
+			},
+			state: {
+				required: "What state?"
+			},
+			zipcode: {
+				required: "Please enter your Zip Code"
+			},
+			phone: {
+				required: "Please enter your phone number"
+			},
+			shipAddress: {
+				required: "Please enter a shipping address"
+			},
+			shipCity: {
+				required: "What city?"
+			},
+			shipState: {
+				required: "What state?"
+			},
+			shipZipcode: {
+				required: "Please enter your Zip Code"
+			},
+			date: {
+				required: "Please select a shipping date"
+			}
+		}
+	}); //end validate
+	
+	$("#confirm").dialog({
+		modal: true,
+		autoOpen: false,
+		buttons: {
+			"Yes" : function() {
+				$("#orderForm").submit();
+				$(this).dialog("close");
+			},
+			"No" : function() {
+				$(this).dialog("close");
+			}
+		}
+	}); //end dialog
+}); //end ready
+</script>
+</head>
+<body>
+<div class="main">
+<div id="tabContainer">
+	<ul>
+		<li><a href="#panel1">Home</a></li>
+		<li><a href="#panel2">About Us</a></li>
+		<li><a href="#panel3">Events</a></li>
+		<li><a href="#panel4">Order Products</a></li>
+		<li><a href="#panel5">Contact Us</a></li>
+	</ul>
+	<!-- panel 1 -->
+	<div id="panel1">
+		<img src="robot.jpg">
+		<h1>Dr. E's Robot Shop</h1>
+		<h2>We are a leading retailer of the latest in robotics</h2>
+		<p>Come visit us today!</p>
+	</div>
+	<!-- panel 2 -->
+	<div id="panel2">
+		<div id="aboutTabs">
+			<ul>
+			<li><a href="#history">History</a></li>
+			<li><a href="#staff">Our Staff</a></li>
+			</ul>
+			<div id="history">
+				<h2>History</h2>
+				<p>Ethan Bard founded Dr. E's Robot Shop after the 
+				invention of the nano-replicator. Our company has 
+				since become one of the leading providers of advanced 
+				robots in the world.<p>
+				<br>
+				<p>Learn more about the future of nanotechnology at the
+				<a href="http://cba.mit.edu">Center for Bits and Atoms at MIT.</a></p>
+			</div>
+			<div id="staff">
+				<h2>Our Staff</h2>
+				<table>
+				<tr>
+					<td><img src="robot4.png"></td>
+					<td>Ethan "Dr. E" Bard is the founder of Dr. E's Robot Shop.</td>
+				</tr>
+				<tr>
+					<td><img src="robot3.png"></td>
+					<td>DS-9 is the artificial inteligence that helps manage our shop.</td>
+				</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- panel 3 -->
+	<div id="panel3">
+		<ul>
+			<li>February 12 - Build-A-Robot Competition</li>
+			<li>March 22 - The Future of Nanomedicine Conference</li>
+			<li>April 12 - Dr. E's Open House</li>
+			<li>May 14 - Consumer Robotics Show</li>
+			<li>May 25 - Career Fair</li>
+		</ul>
+	</div>
+	<!-- panel 4 -->
+	<div id="panel4">
+		<table>
+			<tr>
+				<td><img src="robot1.png" id="replicatorImg" title="Personal Replicator"></td>
+				<td><img src="robot3.png" id="nanorobotImg" title="Medical Nanorobots"></td>
+				<td><img src="robot2.jpg" id="kitImg" title="Build-A-Robot Kit"></td>
+				<td><img src="robot.jpg" id="assistantImg" title="Robot Assistant"></td>
+				<td><img src="robot4.png" id="mathbotImg" title="MathBot Game"></td>
+			</tr>
+			<tr>
+				<td><label for="replicator">Personal Replicator - $300</label>
+					<input type="checkbox" id="replicator"></td>
+				<td><label for="nanorobot">Medical Nanorobots - $200</label>
+					<input type="checkbox" id="nanorobot"></td>
+				<td><label for="robotkit">Build-A-Robot Kit - $50</label>
+					<input type="checkbox" id="robotkit"></td>
+				<td><label for="assistant">Robot Assistant - $150</label>
+					<input type="checkbox" id="assistant"></td>
+				<td><label for="mathbot">MathBot Game - $100</label>
+					<input type="checkbox" id="mathbot"></td>
+			</tr>
+		</table>
+		<!-- Order Form -->
+		<form id="orderForm">
+			<fieldset><legend><strong>Order Form</strong></legend>
+			<p class="replicatorQty">
+			Replicator Quantity:
+			<input type="text" id="replicatorQty" name="replicatorQty" size="1">
+			</p>
+			<p class="nanorobotQty">
+			Nanorobot Quantity:
+			<input type="text" id="nanorobotQty" name="nanorobotQty" size="1">
+			</p>
+			<p class="kitQty">
+			Robot Kit Quantity:
+			<input type="text" id="kitQty" name="kitQty" size="1">
+			</p>
+			<p class="assistantQty">
+			Robot Assistant Quantity:
+			<input type="text" id="assistantQty" name="assistantQty" size="1">
+			</p>
+			<p class="mathbotQty">
+			MathBot Quantity:
+			<input type="text" id="mathbotQty" name="mathbotQty" size="1">
+			</p>
+			<p>
+			Name:<br>
+			<input type="text" id="name" name="name">
+			</p>
+			<p>
+			Email:<br>
+			<input type="text" id="email" name="email">
+			</p>
+			<p>
+			Address:<br>
+			<input type="text" id="address" name="address" size="25">
+			</p>
+			<p>
+			City:<br>
+			<input type="text" id="city" name="city">
+			</p>
+			<p>
+			State:<br>
+			<input type="text" id="state" name="state">
+			</p>
+			<p>
+			Zip Code:<br>
+			<input type="text" id="zipcode" name="zipcode">
+			</p>
+			<p>
+			Phone:<br>
+			<input type="text" id="phone" name="phone">
+			</p>
+			</fieldset>
+			<fieldset><legend><strong>Shipping Information</strong></legend>
+			Address:<br>
+			<input type="text" id="shipAddress" name="shipAddress" size="25">
+			</p>
+			<p>
+			City:<br>
+			<input type="text" id="shipCity" name="shipCity">
+			</p>
+			<p>
+			State:<br>
+			<input type="text" id="shipState" name="shipState">
+			</p>
+			<p>
+			Zip Code:<br>
+			<input type="text" id="shipZipcode" name="shipZipcode">
+			</p>
+			<p>
+			Shipped Date:<br>
+			<input type="text" id="date" name="date">
+			</p>
+			</fieldset>
+		</form>
+		<p>
+		<button id="submit">Submit</button>
+		</p>
+	</div>
+	<!-- panel 5 -->
+	<div id="panel5">
+		<form id="contact">
+			<p>
+			Name:<br>
+			<input type="text" id="contactName" name="contactName">
+			</p>
+			<p>
+			Email:<br>
+			<input type="text" id="contactEmail" name="contactEmail">
+			</p>
+			<p>
+			Comments:
+			<br>
+			<textarea id="comments" name="comments" rows="5" cols="35">
+			</textarea>
+			</p>
+			<button id="contactBtn">Submit</button>
+		</form>
+	</div>
+</div>
+</div>
+<!-- tooltips -->
+<script id="replicatorTip" type="text/template">
+	<p>The last object you will ever need to buy!</p>
+</script>
+<script id="nanorobotTip" type="text/template">
+	<p>Who wants to live forever? Nanorobot buyers!</p>
+</script>
+<script id="robotkitTip" type="text/template">
+	<p>Discover how a robot works</p>
+</script>
+<script id="assistantTip" type="text/template">
+	<p>As seen on TV</p>
+</script>
+<script id="mathbotTip" type="text/template">
+	<p>Learn math the fun way with MathBot</p>
+</script>
+<!-- dialog boxes -->
+<div id="confirm" title="Confirm Purchase">
+	<p id="subtotal">Subtotal:</p>
+	<p id="shipping">Shipping:</p>
+	<p id="salesTax">Sales Tax:</p>
+	<p id="discount">Discount:</p>
+	<p id="total">Total:</p>
+	<p id="">Are you sure you want to buy these products?</p>
+</div>
+</body>
+</html>
